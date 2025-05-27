@@ -1,0 +1,6 @@
+*.sql
+build/
+dist/
+__pycache__/
+venv/
+.env
