@@ -1,0 +1,10 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: [--cov=schema_collector, --cov=schema_collector_gui] 
