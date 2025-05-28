@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from datetime import datetime
+import re
 
 class ModernTheme:
     # Cores
@@ -292,12 +293,22 @@ DB_SCHEMA={self.schema_var.get()}
                         self.log_message_func(msg, level)
                         
                         # Atualizar progresso se a mensagem contiver informações de progresso
-                        if "Progresso:" in msg:
+                        if "Objeto" in msg and "coletado com sucesso" in msg:
                             try:
-                                progress = float(msg.split("Progresso:")[1].split("%")[0].strip())
-                                self.progress_var.set(progress)
-                                self.progress_label.configure(text=f"{progress:.1f}%")
-                            except:
+                                # Extrair nome e tipo do objeto
+                                match = re.search(r"Objeto (.+) \((.+)\) coletado com sucesso", msg)
+                                if match:
+                                    obj_name = match.group(1)
+                                    # Atualizar contagem
+                                    progress = (self.progress_var.get())
+                                    # Extrair contagem do log anterior
+                                    # O valor de self.progress_var já está em %
+                                    # Buscar a contagem atual e total
+                                    processed = int(self.progress_var.get() / 100 * self.total_objects) if hasattr(self, 'total_objects') and self.total_objects else ''
+                                    total = self.total_objects if hasattr(self, 'total_objects') else ''
+                                    # Atualizar label
+                                    self.progress_label.configure(text=f"{progress:.1f}% {processed}/{total} {obj_name}.sql")
+                            except Exception as e:
                                 pass
                     self.text_widget.after(0, append)
             
@@ -305,7 +316,7 @@ DB_SCHEMA={self.schema_var.get()}
             logger = logging.getLogger()
             logger.setLevel(logging.INFO)
             gui_handler = GUILogHandler(self.log_text, self.progress_var, self.progress_label, self.log_message)
-            gui_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+            gui_handler.setFormatter(logging.Formatter('%(message)s'))
             logger.addHandler(gui_handler)
             
             # Criar e executar o coletor
@@ -360,7 +371,7 @@ DB_SCHEMA={self.schema_var.get()}
             logger = logging.getLogger()
             logger.setLevel(logging.INFO)
             gui_handler = GUILogHandler(self.log_text, self.log_message)
-            gui_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+            gui_handler.setFormatter(logging.Formatter('%(message)s'))
             logger.addHandler(gui_handler)
             collector = SchemaCollector()
             collector.output_dir = self.output_dir_var.get()

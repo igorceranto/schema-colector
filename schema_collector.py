@@ -124,7 +124,7 @@ class SchemaCollector:
                 
                 self.processed_objects += 1
                 progress = (self.processed_objects / self.total_objects) * 100
-                logger.info(f"Progresso: {progress:.1f}% ({self.processed_objects}/{self.total_objects})")
+                logger.info(f"Objeto {obj_name} ({obj_type}) coletado com sucesso!")
                 
         except Exception as e:
             logger.error(f"Erro durante a coleta dos objetos: {str(e)}")
