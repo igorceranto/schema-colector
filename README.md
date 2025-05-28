@@ -48,6 +48,19 @@ schema_objects/
 
 Cada objeto será salvo em um arquivo `.sql` separado dentro de sua respectiva pasta.
 
+## Interface Gráfica
+
+A interface exibe uma barra de progresso que mostra:
+- O percentual concluído
+- A quantidade de arquivos processados e o total (ex: 13/16)
+- O nome do arquivo atual sendo processado
+
+Exemplo:
+```
+Progresso
+[███████████---------] 81.2%  13/16  CLIENTES.sql
+```
+
 ## Funcionalidades
 
 - Coleta de tabelas
