@@ -1,3 +1,4 @@
+__version__ = "1.0.0"
 import os
 import cx_Oracle
 from dotenv import load_dotenv
