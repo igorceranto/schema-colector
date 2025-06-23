@@ -1,6 +1,10 @@
-# Schema Collector
+# Schema Colector
 
-Ferramenta para coletar objetos de um schema Oracle e organizá-los em arquivos SQL.
+<p align="center">
+  <img src="logo_16_9.PNG" alt="Logo Schema Colector" width="480"/>
+</p>
+
+Ferramenta para coletar objetos de um schema Oracle e organizá-los em arquivos SQL, de forma limpa e padronizada.
 
 ## Requisitos
 
@@ -26,31 +30,41 @@ DB_DSN=seu_host:porta/servico
 DB_SCHEMA=seu_schema
 ```
 
-## Uso
+## Uso via linha de comando
 
 Execute o script principal:
 ```bash
 python schema_collector.py
 ```
 
-Os objetos serão coletados e organizados na pasta `schema_objects` com a seguinte estrutura:
+Os objetos serão coletados e organizados na pasta `schema_objects` com a seguinte estrutura (apenas os tipos de objetos realmente existentes serão criados):
 ```
 schema_objects/
-├── TABLES/
-├── VIEWS/
-├── PROCEDURES/
-├── FUNCTIONS/
-├── PACKAGES/
-├── TRIGGERS/
-├── SEQUENCES/
-└── INDEXES/
+├── table/
+├── view/
+├── procedure/
+├── function/
+├── package/
+├── trigger/
+└── sequence/
 ```
+Cada objeto será salvo em um arquivo `.sql` separado, com o nome do objeto em minúsculo.
 
-Cada objeto será salvo em um arquivo `.sql` separado dentro de sua respectiva pasta.
+### Observações importantes sobre a exportação
+- Todo o conteúdo dos arquivos é salvo em **letras minúsculas**.
+- O termo `editionable` é removido dos scripts.
+- O `OWNER` e as aspas duplas são removidos dos nomes dos objetos e de todas as referências.
+- Cláusulas do tipo `OWNER TO ...` também são removidas.
+- As pastas de cada tipo só são criadas se houver pelo menos um objeto daquele tipo.
 
 ## Interface Gráfica
 
-A interface exibe uma barra de progresso que mostra:
+Você pode executar a interface gráfica (GUI) para facilitar a configuração e exportação:
+```bash
+python schema_collector_gui.py
+```
+
+A interface exibe uma barra de progresso mostrando:
 - O percentual concluído
 - A quantidade de arquivos processados e o total (ex: 13/16)
 - O nome do arquivo atual sendo processado
@@ -58,7 +72,7 @@ A interface exibe uma barra de progresso que mostra:
 Exemplo:
 ```
 Progresso
-[███████████---------] 81.2%  13/16  CLIENTES.sql
+[███████████---------] 81.2%  13/16  clientes.sql
 ```
 
 ## Funcionalidades
@@ -70,7 +84,6 @@ Progresso
 - Coleta de packages
 - Coleta de triggers
 - Coleta de sequences
-- Coleta de índices
 
 ## Logs
 
@@ -83,22 +96,12 @@ O script gera logs detalhados sobre o processo de coleta, incluindo:
 
 ```
 schema-colector/
-├── schema_collector.py      # Script principal
-├── config.py               # Configurações do projeto
-├── db_connection.py        # Gerenciamento de conexão com o banco
-├── collectors/            # Módulos de coleta específicos
-│   ├── table_collector.py
-│   ├── view_collector.py
-│   ├── procedure_collector.py
-│   ├── function_collector.py
-│   ├── package_collector.py
-│   ├── trigger_collector.py
-│   ├── sequence_collector.py
-│   └── index_collector.py
-├── utils/                 # Utilitários
-│   ├── file_utils.py
-│   └── logging_utils.py
-└── schema_objects/        # Pasta onde os objetos são salvos
+├── schema_collector.py         # Script principal (CLI e lógica)
+├── schema_collector_gui.py     # Interface gráfica (GUI)
+├── requirements.txt            # Dependências
+├── README.md                   # Este arquivo
+├── tests/                      # Testes automatizados
+└── schema_objects/             # Pasta onde os objetos são salvos
 ```
 
 ## Contribuição
