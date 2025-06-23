@@ -23,7 +23,7 @@ if exist "*.spec" del *.spec
 
 :: Gerar executável
 echo Gerando executavel...
-python -m PyInstaller --onefile --windowed --name "Schema Collector" schema_collector_gui.py
+python -m PyInstaller --onefile --windowed --name "Schema Colector" schema_colector_gui.py
 
 :: Desativar ambiente virtual
 call venv\Scripts\deactivate.bat

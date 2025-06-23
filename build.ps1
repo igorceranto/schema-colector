@@ -40,7 +40,7 @@ pip install pyinstaller
 
 # Fechar processos que possam estar usando os arquivos
 Write-Host "Verificando processos..." -ForegroundColor Yellow
-Get-Process | Where-Object { $_.Path -like "*schema_collector_gui*" } | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process | Where-Object { $_.Path -like "*schema_colector_gui*" } | Stop-Process -Force -ErrorAction SilentlyContinue
 
 # Aguardar um momento para garantir que os arquivos foram liberados
 Start-Sleep -Seconds 2
@@ -62,13 +62,13 @@ if (Test-Path "*.spec") {
 
 # Gerar executável
 Write-Host "Gerando executável..." -ForegroundColor Yellow
-python -m PyInstaller --onefile --windowed --name "Schema Collector" schema_collector_gui.py
+python -m PyInstaller --onefile --windowed --name "Schema Colector" schema_colector_gui.py
 
 # Desativar ambiente virtual
 deactivate
 
 Write-Host "`nBuild concluído com sucesso!" -ForegroundColor Green
-Write-Host "O executável está disponível em: dist\Schema Collector.exe" -ForegroundColor Cyan
+Write-Host "O executável está disponível em: dist\Schema Colector.exe" -ForegroundColor Cyan
 
 # Aguardar input do usuário
 Write-Host "`nPressione qualquer tecla para continuar..."

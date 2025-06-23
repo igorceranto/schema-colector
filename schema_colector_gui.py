@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import threading
-from schema_collector import SchemaCollector
+from schema_colector import SchemaColector
 import os
 from dotenv import load_dotenv
 import logging
@@ -69,10 +69,10 @@ class ModernTheme:
                        background=ModernTheme.PRIMARY,
                        troughcolor=ModernTheme.SURFACE)
 
-class SchemaCollectorGUI:
+class SchemaColectorGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Schema Collector")
+        self.root.title("Schema colector")
         self.root.geometry("700x550")
         self.root.resizable(False, False)
         self.root.configure(bg=ModernTheme.BACKGROUND)
@@ -98,7 +98,7 @@ class SchemaCollectorGUI:
         
     def create_widgets(self):
         # Título e descrição
-        ttk.Label(self.root, text="Schema Collector", font=("Segoe UI", 15, "bold"), background=ModernTheme.BACKGROUND, foreground=ModernTheme.PRIMARY).pack(pady=(8,0))
+        ttk.Label(self.root, text="Schema colector", font=("Segoe UI", 15, "bold"), background=ModernTheme.BACKGROUND, foreground=ModernTheme.PRIMARY).pack(pady=(8,0))
         ttk.Label(self.root, text="Ferramenta para exportar objetos de um schema Oracle", font=("Segoe UI", 9), background=ModernTheme.BACKGROUND, foreground=ModernTheme.SECONDARY).pack(pady=(0,6))
 
         # Frame principal com padding
@@ -320,8 +320,8 @@ DB_SCHEMA={self.schema_var.get()}
             logger.addHandler(gui_handler)
             
             # Criar e executar o coletor
-            collector = SchemaCollector()
-            collector.output_dir = self.output_dir_var.get()
+            colector = SchemaColector()
+            colector.output_dir = self.output_dir_var.get()
             
             # Configurar variáveis de ambiente
             os.environ['DB_USER'] = self.username_var.get()
@@ -329,9 +329,9 @@ DB_SCHEMA={self.schema_var.get()}
             os.environ['DB_DSN'] = self.dsn_var.get()
             os.environ['DB_SCHEMA'] = self.schema_var.get()
             
-            collector.connect()
-            collector.collect_objects()
-            collector.close()
+            colector.connect()
+            colector.collect_objects()
+            colector.close()
             
             self.log_message("Coleta concluída com sucesso!", "SUCCESS")
             messagebox.showinfo("Sucesso", "Coleta concluída com sucesso!")
@@ -373,21 +373,21 @@ DB_SCHEMA={self.schema_var.get()}
             gui_handler = GUILogHandler(self.log_text, self.log_message)
             gui_handler.setFormatter(logging.Formatter('%(message)s'))
             logger.addHandler(gui_handler)
-            collector = SchemaCollector()
-            collector.output_dir = self.output_dir_var.get()
+            colector = SchemaColector()
+            colector.output_dir = self.output_dir_var.get()
             os.environ['DB_USER'] = self.username_var.get()
             os.environ['DB_PASSWORD'] = self.password_var.get()
             os.environ['DB_DSN'] = self.dsn_var.get()
             os.environ['DB_SCHEMA'] = self.schema_var.get()
-            collector.connect()
+            colector.connect()
             # Buscar tipo do objeto
-            object_type = self._get_object_type(collector, object_name)
+            object_type = self._get_object_type(colector, object_name)
             if not object_type:
                 self.log_message(f"Objeto '{object_name}' não encontrado no schema.", "ERROR")
                 messagebox.showerror("Erro", f"Objeto '{object_name}' não encontrado no schema.")
-                collector.close()
+                colector.close()
                 return
-            definition = collector.get_object_definition(object_name, object_type)
+            definition = colector.get_object_definition(object_name, object_type)
             if definition:
                 # Remover 'EDITIONABLE'
                 definition = re.sub(r'EDITIONABLE\s*', '', definition, flags=re.IGNORECASE)
@@ -406,7 +406,7 @@ DB_SCHEMA={self.schema_var.get()}
                 definition = re.sub(r'"([^"]+)"', lambda m: m.group(1).lower(), definition)
                 # Salvar tudo em lowercase
                 definition = definition.lower()
-                dir_path = os.path.join(collector.output_dir, object_type_clean)
+                dir_path = os.path.join(colector.output_dir, object_type_clean)
                 os.makedirs(dir_path, exist_ok=True)
                 file_path = os.path.join(dir_path, f"{obj_name_clean}.sql")
                 with open(file_path, 'w', encoding='utf-8') as f:
@@ -416,18 +416,18 @@ DB_SCHEMA={self.schema_var.get()}
             else:
                 self.log_message(f"Não foi possível extrair o objeto '{object_name}'.", "ERROR")
                 messagebox.showerror("Erro", f"Não foi possível extrair o objeto '{object_name}'.")
-            collector.close()
+            colector.close()
         except Exception as e:
             self.log_message(f"Erro ao extrair objeto: {str(e)}", "ERROR")
             messagebox.showerror("Erro", f"Erro ao extrair objeto: {str(e)}")
 
-    def _get_object_type(self, collector, object_name):
+    def _get_object_type(self, colector, object_name):
         try:
             query = """
             SELECT OBJECT_TYPE FROM ALL_OBJECTS WHERE OWNER = :1 AND OBJECT_NAME = :2
             """
-            collector.cursor.execute(query, (os.getenv('DB_SCHEMA'), object_name))
-            result = collector.cursor.fetchone()
+            colector.cursor.execute(query, (os.getenv('DB_SCHEMA'), object_name))
+            result = colector.cursor.fetchone()
             if result:
                 return result[0]
             return None
@@ -436,7 +436,7 @@ DB_SCHEMA={self.schema_var.get()}
 
 def main():
     root = tk.Tk()
-    app = SchemaCollectorGUI(root)
+    app = SchemaColectorGUI(root)
     root.mainloop()
 
 if __name__ == "__main__":

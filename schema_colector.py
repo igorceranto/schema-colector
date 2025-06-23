@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # Carrega variáveis de ambiente
 load_dotenv()
 
-class SchemaCollector:
+class SchemaColector:
     def __init__(self):
         self.connection = None
         self.cursor = None
@@ -145,7 +145,7 @@ class SchemaCollector:
             logger.info("Conexão fechada.")
 
 def main():
-    collector = SchemaCollector()
+    collector = SchemaColector()
     try:
         collector.connect()
         collector.collect_objects()

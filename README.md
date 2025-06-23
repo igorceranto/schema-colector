@@ -34,7 +34,7 @@ DB_SCHEMA=seu_schema
 
 Execute o script principal:
 ```bash
-python schema_collector.py
+python schema_colector.py
 ```
 
 Os objetos serão coletados e organizados na pasta `schema_objects` com a seguinte estrutura (apenas os tipos de objetos realmente existentes serão criados):
@@ -61,7 +61,7 @@ Cada objeto será salvo em um arquivo `.sql` separado, com o nome do objeto em m
 
 Você pode executar a interface gráfica (GUI) para facilitar a configuração e exportação:
 ```bash
-python schema_collector_gui.py
+python schema_colector_gui.py
 ```
 
 A interface exibe uma barra de progresso mostrando:
@@ -96,8 +96,8 @@ O script gera logs detalhados sobre o processo de coleta, incluindo:
 
 ```
 schema-colector/
-├── schema_collector.py         # Script principal (CLI e lógica)
-├── schema_collector_gui.py     # Interface gráfica (GUI)
+├── schema_colector.py         # Script principal (CLI e lógica)
+├── schema_colector_gui.py     # Interface gráfica (GUI)
 ├── requirements.txt            # Dependências
 ├── README.md                   # Este arquivo
 ├── tests/                      # Testes automatizados

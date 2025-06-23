@@ -2,7 +2,7 @@
 set -e
 
 # Nome do executável e release
-APP_NAME="schema_collector_gui"
+APP_NAME="schema_colector_gui"
 RELEASE_DIR="release"
 DIST_DIR="dist"
 ZIP_NAME="${APP_NAME}_linux_$(date +%Y%m%d_%H%M%S).zip"
@@ -38,7 +38,7 @@ rm -rf build "$DIST_DIR" *.spec "$RELEASE_DIR"
 
 # Gerar executável
 echo -e "${YELLOW}Gerando executável...${NC}"
-pyinstaller --onefile --windowed --name "$APP_NAME" schema_collector_gui.py
+pyinstaller --onefile --windowed --name "$APP_NAME" schema_colector_gui.py
 
 # Criar pasta de release e compactar
 mkdir -p "$RELEASE_DIR"

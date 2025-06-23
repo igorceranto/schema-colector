@@ -7,4 +7,4 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        args: [--cov=schema_collector, --cov=schema_collector_gui] 
+        args: [--cov=schema_colector, --cov=schema_colector_gui] 
