@@ -3,6 +3,12 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 import tkinter as tk
+
+try:
+    tk.Tk()
+except tk.TclError:
+    pytest.skip("Tkinter não disponível", allow_module_level=True)
+
 from schema_colector import SchemaColector
 from schema_colector_gui import SchemaColectorGUI
 
