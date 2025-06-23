@@ -389,9 +389,26 @@ DB_SCHEMA={self.schema_var.get()}
                 return
             definition = collector.get_object_definition(object_name, object_type)
             if definition:
-                dir_path = os.path.join(collector.output_dir, object_type.lower())
+                # Remover 'EDITIONABLE'
+                definition = re.sub(r'EDITIONABLE\s*', '', definition, flags=re.IGNORECASE)
+                schema = os.getenv('DB_SCHEMA')
+                obj_name_clean = object_name.lower()
+                object_type_clean = object_type.lower()
+                # Remove o owner do nome do objeto no DDL (ex: "OWNER"."OBJETO" -> "objeto")
+                pattern = rf'"{schema}"\."{object_name}"'
+                definition = re.sub(pattern, obj_name_clean, definition, flags=re.IGNORECASE)
+                # Remove o owner de todas as referências do tipo "OWNER"."ALGUMA_COISA"
+                pattern_all = rf'"{schema}"\."([^"]+)"'
+                definition = re.sub(pattern_all, lambda m: m.group(1).lower(), definition, flags=re.IGNORECASE)
+                # Remove cláusulas OWNER (ex: OWNER TO ...)
+                definition = re.sub(r'OWNER TO \\"?[^;\n]+', '', definition, flags=re.IGNORECASE)
+                # Remove aspas duplas dos nomes dos objetos
+                definition = re.sub(r'"([^"]+)"', lambda m: m.group(1).lower(), definition)
+                # Salvar tudo em lowercase
+                definition = definition.lower()
+                dir_path = os.path.join(collector.output_dir, object_type_clean)
                 os.makedirs(dir_path, exist_ok=True)
-                file_path = os.path.join(dir_path, f"{object_name}.sql")
+                file_path = os.path.join(dir_path, f"{obj_name_clean}.sql")
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(definition)
                 self.log_message(f"Objeto '{object_name}' ({object_type}) extraído com sucesso!", "SUCCESS")

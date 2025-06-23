@@ -3,6 +3,7 @@ import cx_Oracle
 from dotenv import load_dotenv
 import logging
 from datetime import datetime
+import re
 
 # Configuração de logging
 logging.basicConfig(
@@ -35,14 +36,6 @@ class SchemaCollector:
         except Exception as e:
             logger.error(f"Erro ao conectar ao banco de dados: {str(e)}")
             raise
-
-    def create_output_directories(self):
-        """Cria diretórios para cada tipo de objeto"""
-        object_types = ['TABLE', 'VIEW', 'PROCEDURE', 'FUNCTION', 'PACKAGE', 'TRIGGER', 'SEQUENCE']
-        for obj_type in object_types:
-            path = os.path.join(self.output_dir, obj_type.lower())
-            os.makedirs(path, exist_ok=True)
-            logger.info(f"Diretório criado: {path}")
 
     def get_object_definition(self, object_name, object_type):
         """Obtém a definição do objeto do banco de dados"""
@@ -94,8 +87,6 @@ class SchemaCollector:
     def collect_objects(self):
         """Coleta todos os objetos do schema"""
         try:
-            self.create_output_directories()
-            
             # Consulta para obter todos os objetos do schema
             query = """
             SELECT OBJECT_NAME, OBJECT_TYPE 
@@ -104,28 +95,43 @@ class SchemaCollector:
             AND OBJECT_TYPE IN ('TABLE', 'VIEW', 'PROCEDURE', 'FUNCTION', 'PACKAGE', 'TRIGGER', 'SEQUENCE')
             ORDER BY OBJECT_TYPE, OBJECT_NAME
             """
-            
             self.cursor.execute(query, (os.getenv('DB_SCHEMA'),))
             objects = self.cursor.fetchall()
-            
             self.total_objects = len(objects)
             self.processed_objects = 0
-            
             logger.info(f"Iniciando coleta de {self.total_objects} objetos...")
-            
+            created_dirs = set()
             for obj_name, obj_type in objects:
                 definition = self.get_object_definition(obj_name, obj_type)
-                
                 if definition:
-                    file_path = os.path.join(self.output_dir, obj_type.lower(), f"{obj_name}.sql")
+                    # Remover 'EDITIONABLE'
+                    definition = re.sub(r'EDITIONABLE\s*', '', definition, flags=re.IGNORECASE)
+                    schema = os.getenv('DB_SCHEMA')
+                    obj_name_clean = obj_name.lower()
+                    obj_type_clean = obj_type.lower()
+                    # Remove o owner do nome do objeto no DDL (ex: "OWNER"."OBJETO" -> "objeto")
+                    pattern = rf'"{schema}"\."{obj_name}"'
+                    definition = re.sub(pattern, obj_name_clean, definition, flags=re.IGNORECASE)
+                    # Remove o owner de todas as referências do tipo "OWNER"."ALGUMA_COISA"
+                    pattern_all = rf'"{schema}"\."([^"]+)"'
+                    definition = re.sub(pattern_all, lambda m: m.group(1).lower(), definition, flags=re.IGNORECASE)
+                    # Remove cláusulas OWNER (ex: OWNER TO ...)
+                    definition = re.sub(r'OWNER TO \\"?[^;\n]+', '', definition, flags=re.IGNORECASE)
+                    # Remove aspas duplas dos nomes dos objetos
+                    definition = re.sub(r'"([^"]+)"', lambda m: m.group(1).lower(), definition)
+                    # Salvar tudo em lowercase
+                    definition = definition.lower()
+                    dir_path = os.path.join(self.output_dir, obj_type_clean)
+                    if dir_path not in created_dirs:
+                        os.makedirs(dir_path, exist_ok=True)
+                        created_dirs.add(dir_path)
+                    file_path = os.path.join(dir_path, f"{obj_name_clean}.sql")
                     with open(file_path, 'w', encoding='utf-8') as f:
                         f.write(definition)
                     logger.info(f"Objeto {obj_name} ({obj_type}) coletado com sucesso!")
-                
                 self.processed_objects += 1
                 progress = (self.processed_objects / self.total_objects) * 100
                 logger.info(f"Objeto {obj_name} ({obj_type}) coletado com sucesso!")
-                
         except Exception as e:
             logger.error(f"Erro durante a coleta dos objetos: {str(e)}")
             raise

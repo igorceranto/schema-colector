@@ -50,13 +50,6 @@ def test_connect_exception_logging(mock_connect, collector, caplog):
         collector.connect()
     assert any("Erro ao conectar ao banco de dados" in m for m in caplog.text.splitlines())
 
-def test_create_output_directories(collector):
-    """Testa a criação dos diretórios de saída"""
-    collector.create_output_directories()
-    for obj_type in ['table', 'view', 'procedure', 'function', 'package', 'trigger', 'sequence']:
-        path = os.path.join(collector.output_dir, obj_type)
-        assert os.path.exists(path)
-
 @patch('os.getenv')
 def test_get_object_definition(mock_getenv, collector, mock_cursor):
     """Testa a obtenção da definição de um objeto"""
